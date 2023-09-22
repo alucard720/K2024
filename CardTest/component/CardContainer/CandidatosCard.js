@@ -16,54 +16,82 @@ const getListCandidatos = () => {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
+  /*  useEffect(() => {
     getApiData();
-  }, []);
+  }, []); */
 
-  const getApiData = async () => {
-    const url = "http://10.20.35.185:5000/candidatos-list";
-    let result = await fetch(url);
+  const getApiData = async (query) => {
+    /*     const query = e.target.query;
+     */ fetch(`http://192.168.1.30:5000/mssql/data?=${query}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setData(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    /* let result = await fetch(url);
     result = await result.json();
-    setData(result);
+    setData(result); */
   };
 
-  const handleSearch = async () => {
+  /* const handleSearch = async () => {
+    
     try {
-      const response = await fetch(`http://10.20.35.185:5000/search/${search}`);
+      const response = await fetch(
+        `http://10.20.35.185:5000/candidatos-list?=${query}`
+      );
       setSearch(response.data);
     } catch (error) {
       console.error(error);
     }
-  };
+  }; */
 
   return (
     <View>
       <View>
         <TextInput
-          style={styles.input}
-          value={search}
-          onChangeText={(text) => setSearch(text)}
+          onChangeText={getApiData}
+          placeholder="Search User"
+          style={{
+            width: "300px",
+            borderWidth: 1,
+            borderColor: "gray",
+            padding: 4,
+            margin: 16,
+          }}
         />
-        <Button title="Search" onClick={handleSearch} />
       </View>
-      {data.map ? (
-        <FlatList
-          data={data}
-          keyExtractor={(item) => item._id}
-          renderItem={({ item, index }) => (
-            <View style={styles.itemWrapper}>
-              <Card style={styles.card}>
-                <Image source={image} style={styles.itemImageStyle} />
-                <Text style={styles.TextStyle}>Nombre:{item.Nombres}</Text>
-                <Text style={styles.TextStyle}>Apellidos:{item.Apellidos}</Text>
-                <Text style={styles.TextStyle}>Cedula:{item.Cedula}</Text>
-                <Text style={styles.TextStyle}>Sexo:{item.Sexo}</Text>
-                <Text style={styles.TextStyle}>Municipio:{item.Municipio}</Text>
-              </Card>
-            </View>
-          )}
-        />
-      ) : null}
+
+      {data.length > 0 && (
+        <>
+          {data.map ? (
+            <FlatList
+              data={data}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item, i }) => (
+                <View style={styles.itemWrapper}>
+                  <Card style={styles.card}>
+                    <Image source={image} style={styles.itemImageStyle} />
+                    <Text style={styles.TextStyle} key={item.cedula}>
+                      Cedula:{item.cedula}
+                    </Text>
+                    <Text style={styles.TextStyle} key={item.nombres}>
+                      Nombre:{item.nombres}
+                    </Text>
+                    <Text style={styles.TextStyle} key={item.primer_apellido}>
+                      Apellidos:{item.primer_apellido}
+                    </Text>
+                    <Text style={styles.TextStyle} key={item.sexo}>
+                      Sexo:{item.sexo}
+                    </Text>
+                  </Card>
+                </View>
+              )}
+            />
+          ) : null}
+        </>
+      )}
     </View>
   );
 };
@@ -95,6 +123,10 @@ const styles = StyleSheet.create({
   TextStyle: {
     color: "#FFFFFF",
     alignItems: "center",
+  },
+  input: {
+    borderColor: "#FFFFFF",
+    fontSize: 22,
   },
 });
 
