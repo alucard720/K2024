@@ -22,7 +22,7 @@ const getListCandidatos = () => {
 
   const getApiData = async (query) => {
     /*     const query = e.target.query;
-     */ fetch(`http://192.168.1.30:5000/mssql/data?=${query}`)
+     */ await fetch(`http://192.168.1.30:5000/mssql/data?=${query}`)
       .then((response) => response.json())
       .then((data) => {
         setData(data);
@@ -49,17 +49,11 @@ const getListCandidatos = () => {
 
   return (
     <View>
-      <View>
+      <View style={styles.container}>
         <TextInput
+          style={styles.searchBar}
           onChangeText={getApiData}
-          placeholder="Search User"
-          style={{
-            width: "300px",
-            borderWidth: 1,
-            borderColor: "gray",
-            padding: 4,
-            margin: 16,
-          }}
+          placeholder="Buscar"
         />
       </View>
 
@@ -127,6 +121,17 @@ const styles = StyleSheet.create({
   input: {
     borderColor: "#FFFFFF",
     fontSize: 22,
+  },
+  searchBar: {
+    paddingLeft: 10,
+    fontSize: 16,
+  },
+  container: {
+    height: "25%",
+    paddingHorizontal: "50%",
+    borderRadius: 30,
+    justifyContent: "center",
+    borderWidth: 1,
   },
 });
 

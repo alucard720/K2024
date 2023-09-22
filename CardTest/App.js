@@ -8,9 +8,7 @@ const App = () => {
     <>
       <StatusBar />
       <Text style={styles.Header}> K2024</Text>
-      <SafeAreaView style={styles.container}>
-        <CardCandidatos />
-      </SafeAreaView>
+      <SafeAreaView style={styles.container}></SafeAreaView>
     </>
   );
 };
