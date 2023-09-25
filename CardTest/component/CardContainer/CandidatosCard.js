@@ -7,22 +7,28 @@ import {
   Image,
   TextInput,
   Button,
+  VirtualizedList,
 } from "react-native";
+
+import { Ionicons } from "@expo/vector-icons";
+import SearchBar from "../SearchBar";
 import Card from "./Card";
-import image from "../../assets/favicon.png";
-import { style } from "styled-system";
-
+import CardSection from "./CardSection";
 const getListCandidatos = () => {
+  const [searchPhrase, setSearchPhrase] = useState("");
+  const [clicked, setClicked] = useState(false);
   const [data, setData] = useState([]);
-  const [search, setSearch] = useState("");
+  const [loaded, setLoaded] = useState();
 
-  /*  useEffect(() => {
+  /*   useEffect(() => {
+   
+
     getApiData();
   }, []); */
 
   const getApiData = async (query) => {
     /*     const query = e.target.query;
-     */ await fetch(`http://192.168.1.30:5000/mssql/data?=${query}`)
+     */ await fetch(`http://10.0.0.253:5000/mssql/data?=${query}`)
       .then((response) => response.json())
       .then((data) => {
         setData(data);
@@ -49,38 +55,47 @@ const getListCandidatos = () => {
 
   return (
     <View>
-      <View style={styles.container}>
+      {/*   <View style={styles.container}>
         <TextInput
           style={styles.searchBar}
           onChangeText={getApiData}
           placeholder="Buscar"
         />
-      </View>
+      </View> */}
+      <SearchBar
+        searchPhrase={searchPhrase}
+        setSearchPhrase={setSearchPhrase}
+        clicked={clicked}
+        setClicked={setClicked}
+        onChangeText={getApiData}
+      />
 
       {data.length > 0 && (
         <>
           {data.map ? (
             <FlatList
               data={data}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item, i }) => (
-                <View style={styles.itemWrapper}>
-                  <Card style={styles.card}>
-                    <Image source={image} style={styles.itemImageStyle} />
+              keyExtractor={(item) => item.cedula.toString()}
+              renderItem={({ item }) => (
+                <Card>
+                  <View>
+                    <Ionicons name="person" size={30} color="black" />
+                  </View>
+                  <View>
                     <Text style={styles.TextStyle} key={item.cedula}>
                       Cedula:{item.cedula}
                     </Text>
                     <Text style={styles.TextStyle} key={item.nombres}>
                       Nombre:{item.nombres}
                     </Text>
-                    <Text style={styles.TextStyle} key={item.primer_apellido}>
-                      Apellidos:{item.primer_apellido}
-                    </Text>
-                    <Text style={styles.TextStyle} key={item.sexo}>
-                      Sexo:{item.sexo}
-                    </Text>
-                  </Card>
-                </View>
+                  </View>
+                  <Text style={styles.TextStyle} key={item.primer_apellido}>
+                    Apellidos:{item.primer_apellido}
+                  </Text>
+                  <Text style={styles.TextStyle} key={item.sexo}>
+                    Sexo:{item.sexo}
+                  </Text>
+                </Card>
               )}
             />
           ) : null}
@@ -115,7 +130,7 @@ const styles = StyleSheet.create({
   },
 
   TextStyle: {
-    color: "#FFFFFF",
+    color: "white",
     alignItems: "center",
   },
   input: {
@@ -127,8 +142,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   container: {
-    height: "25%",
-    paddingHorizontal: "50%",
+    height: "150",
+    paddingHorizontal: "200",
     borderRadius: 30,
     justifyContent: "center",
     borderWidth: 1,

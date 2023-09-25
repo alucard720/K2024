@@ -1,14 +1,21 @@
 import React from "react";
 import CardCandidatos from "./component/CardContainer/CandidatosCard";
-import { View, StyleSheet, Text, StatusBar } from "react-native";
+import { StyleSheet, Text, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native";
+import Card from "./component/CardContainer/Card";
+import CardCiudadanos from "./component/CardContainer/CardCiudadanos";
 
 const App = () => {
   return (
     <>
       <StatusBar />
-      <Text style={styles.Header}> K2024</Text>
-      <SafeAreaView style={styles.container}></SafeAreaView>
+      <Text style={styles.Header}>L2024</Text>
+      <SafeAreaView style={styles.container}>
+        <CardCiudadanos />
+        {/*  <CardCandidatos /> */}
+
+        {/* <HomeScreen/> */}
+      </SafeAreaView>
     </>
   );
 };
@@ -28,6 +35,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 40,
     elevation: 25,
     paddingEnd: 20,
+    fontSize: 35,
+    color: "#FFFFFF",
   },
   card: {
     height: 200,

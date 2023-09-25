@@ -2,40 +2,45 @@ import React from "react";
 import { StyleSheet, Text, View, FlatList, SafeAreaView } from "react-native";
 
 // definition of the Item, which will be rendered in the FlatList
-const Item = (item) => (
+const Item = ({ cedula, nombres, primer_apellido, sexo }) => (
   <View style={styles.item}>
-    <Text style={styles.title} key={item.cedula}>
-      Cedula:{item.cedula}
-    </Text>
-    <Text style={styles.details} key={item.nombres}>
-      Nombres:{item.nombres}
-    </Text>
+    <Text style={styles.title}>Carnet:{cedula}</Text>
+    <Text style={styles.details}>Nombre:{nombres}</Text>
+    <Text style={styles.details}>Apellidos:{primer_apellido}</Text>
+    <Text style={styles.details}>Genero:{sexo}</Text>
   </View>
 );
 
 // the filter
 const List = (props) => {
-  const renderItem = ({ item, cedula }) => {
-    // when no input, show all
-    /*   if (props.searchPhrase === "") {
-      return <Item name={item.cedula} />;
-    } */
+  const renderItem = ({ item }) => {
+    // when no input, no show all
+    if (props.searchPhrase === "") {
+      return;
+    }
     // filter of the name
-    if (
+    else if (
       item.cedula
-      /* .toUpperCase()
-        .includes(props.searchPhrase.toUpperCase().trim().replace(/\s/g, "")) */
+        .toUpperCase()
+        .includes(props.searchPhrase.toUpperCase().trim().replace(/\s/g, ""))
     ) {
-      return <Item key={cedula} />;
+      return (
+        <Item
+          cedula={item.cedula}
+          nombres={item.nombres}
+          primer_apellido={item.primer_apellido}
+          sexo={item.sexo}
+        />
+      );
     }
     // filter of the description
-    if (
-      item.nombres
-      /* .toUpperCase()
-        .includes(props.searchPhrase.toUpperCase().trim().replace(/\s/g, "")) */
+    /*     if (
+      item.details
+        .toUpperCase()
+        .includes(props.searchPhrase.toUpperCase().trim().replace(/\s/g, ""))
     ) {
-      return <Item key={item.nombres} />;
-    }
+      return <Item name={item.name} details={item.details} />;
+    } */
   };
 
   return (
@@ -48,7 +53,7 @@ const List = (props) => {
         <FlatList
           data={props.data}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.cedula}
         />
       </View>
     </SafeAreaView>

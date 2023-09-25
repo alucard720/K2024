@@ -22,7 +22,7 @@ app.use(bodyParser.json());
   useUnifiedTopology: true,
 }); */
 
-app.get("/candidatos-list", async (req, res) => {
+/* app.get("/candidatos-list", async (req, res) => {
   const candidatos = await Canditatos.find();
   if (candidatos.length > 0) {
     res.send(candidatos);
@@ -42,7 +42,7 @@ app.get("/search", async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {});
+app.post("/login", async (req, res) => {}); */
 
 // connection to sqlserver azure
 app.get("/mssql/data", async (req, res) => {
@@ -51,6 +51,11 @@ app.get("/mssql/data", async (req, res) => {
     password: "maxelltod",
     server: "localhost",
     database: "APP",
+    pool: {
+      max: 5,
+      min: 0,
+      idleTimeoutMillis: 30000,
+    },
     options: {
       trustedConnection: false,
       trustServerCertificate: false,
