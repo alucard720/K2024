@@ -1,9 +1,7 @@
 import React from "react";
-import CardCandidatos from "./component/CardContainer/CandidatosCard";
 import { StyleSheet, Text, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native";
-import Card from "./component/CardContainer/Card";
-import CardCiudadanos from "./component/CardContainer/CardCiudadanos";
+import ImagedCardView from "react-native-imaged-card-view";
 
 const App = () => {
   return (
@@ -11,9 +9,10 @@ const App = () => {
       <StatusBar />
       <Text style={styles.Header}>L2024</Text>
       <SafeAreaView style={styles.container}>
-        <CardCiudadanos />
+        <ImagedCardView />
+        {/*         <CardCiudadanos />
+         */}{" "}
         {/*  <CardCandidatos /> */}
-
         {/* <HomeScreen/> */}
       </SafeAreaView>
     </>

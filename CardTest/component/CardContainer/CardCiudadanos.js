@@ -18,6 +18,7 @@ const CardCiudadanos = () => {
   const [clicked, setClicked] = useState(false);
   const [fakeData, setFakeData] = useState([]);
   const [isloading, setIsLoading] = useState("");
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     fetch(API_ENDPOINT)
@@ -35,7 +36,9 @@ const CardCiudadanos = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, marginHorizontal: 20 }}>
+    <SafeAreaView
+      style={{ flex: 1, marginHorizontal: 20, alignItems: "center" }}
+    >
       {!clicked && (
         <Text style={styles.itemContainer}>BUSCAR SOLO POR CEDULA</Text>
       )}
@@ -72,6 +75,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginLeft: 10,
     marginTop: 10,
+    fontSize: 24,
+    fontWeight: "bold",
   },
   image: {
     width: 50,
