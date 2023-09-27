@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native";
-import ImagedCardView from "react-native-imaged-card-view";
+import CardCiudadanos from "./component/CardContainer/CardCiudadanos";
 
 const App = () => {
   return (
@@ -9,9 +9,8 @@ const App = () => {
       <StatusBar />
       <Text style={styles.Header}>L2024</Text>
       <SafeAreaView style={styles.container}>
-        <ImagedCardView />
-        {/*         <CardCiudadanos />
-         */}{" "}
+        {/*    <CardCiudadanos /> */}
+
         {/*  <CardCandidatos /> */}
         {/* <HomeScreen/> */}
       </SafeAreaView>
