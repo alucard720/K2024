@@ -1,9 +1,10 @@
 import React from "react";
-import CardCandidatos from "./component/CardContainer/CandidatosCard";
 import { StyleSheet, Text, StatusBar } from "react-native";
 import { SafeAreaView } from "react-native";
-import Card from "./component/CardContainer/Card";
 import CardCiudadanos from "./component/CardContainer/CardCiudadanos";
+import ImagedCardView from "react-native-imaged-card-view";
+const yosemite =
+  "https://images.unsplash.com/photo-1548625361-1adcab316530?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1350&q=80";
 
 const App = () => {
   return (
@@ -11,7 +12,20 @@ const App = () => {
       <StatusBar />
       <Text style={styles.Header}>L2024</Text>
       <SafeAreaView style={styles.container}>
-        <CardCiudadanos />
+        <ImagedCardView
+          stars={5}
+          reviews={456}
+          ratings={4.5}
+          title="Yosemite"
+          rightSideValue="$990"
+          subtitle="California"
+          leftSideValue="3 Days"
+          backgroundColor="#ff6460"
+          source={{
+            uri: yosemite,
+          }}
+        />
+        {/*   <CardCiudadanos /> */}
         {/*  <CardCandidatos /> */}
 
         {/* <HomeScreen/> */}
