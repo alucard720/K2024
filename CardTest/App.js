@@ -1,5 +1,10 @@
 import React from "react";
+<<<<<<< HEAD
 import { StyleSheet, Text, StatusBar, SafeAreaView } from "react-native";
+=======
+import { StyleSheet, Text, StatusBar } from "react-native";
+import { SafeAreaView } from "react-native";
+>>>>>>> 7830b37b8fbe2db7735e1f1059e43cd139a4a9a4
 import CardCiudadanos from "./component/CardContainer/CardCiudadanos";
 
 const App = () => {
@@ -8,7 +13,14 @@ const App = () => {
       <StatusBar />
       <Text style={styles.Header}>L2024</Text>
       <SafeAreaView style={styles.container}>
+<<<<<<< HEAD
         <CardCiudadanos />
+=======
+        {/*    <CardCiudadanos /> */}
+
+        {/*  <CardCandidatos /> */}
+        {/* <HomeScreen/> */}
+>>>>>>> 7830b37b8fbe2db7735e1f1059e43cd139a4a9a4
       </SafeAreaView>
     </>
   );
