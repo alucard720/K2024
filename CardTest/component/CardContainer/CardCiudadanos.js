@@ -16,7 +16,7 @@ const API_ENDPOINT = "http://192.168.1.30:5000/mssql/data";
 const CardCiudadanos = () => {
   const [searchPhrase, setSearchPhrase] = useState("");
   const [clicked, setClicked] = useState(false);
-  const [fakeData, setFakeData] = useState([]);
+  const [fakeData, setFakeData] = useState({ res: [], loading: false });
   const [isloading, setIsLoading] = useState("");
 
   useEffect(() => {
@@ -35,7 +35,13 @@ const CardCiudadanos = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, marginHorizontal: 20 }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        marginHorizontal: 20,
+        alignItems: "center",
+      }}
+    >
       {!clicked && (
         <Text style={styles.itemContainer}>BUSCAR SOLO POR CEDULA</Text>
       )}
@@ -68,10 +74,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   itemContainer: {
+    justifyContent: "center",
     flexDirection: "row",
-    alignItems: "center",
     marginLeft: 10,
     marginTop: 10,
+    fontSize: 24,
+    fontWeight: "bold",
   },
   image: {
     width: 50,

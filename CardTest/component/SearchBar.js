@@ -20,9 +20,12 @@ const SearchBar = (props) => {
         />
         <TextInput
           style={styles.input}
+          keyboardType="numeric"
           placeholder="Search"
+          returnKeyType="enter"
           value={props.searchPhrase}
           onChangeText={props.setSearchPhrase}
+          maxLength={11}
           onFocus={() => {
             props.setClicked(true);
           }}

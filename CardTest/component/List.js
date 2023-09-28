@@ -1,34 +1,53 @@
-import React from "react";
-import { StyleSheet, Text, View, FlatList, SafeAreaView } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  FlatList,
+  SafeAreaView,
+  ActivityIndicator,
+  Image,
+} from "react-native";
+import Card from "./CardDesign/Card";
+import foto from "../assets/favicon.png";
 
 // definition of the Item, which will be rendered in the FlatList
-const Item = ({ cedula, nombres, primer_apellido, sexo }) => (
-  <View style={styles.item}>
-    <Text style={styles.title}>Carnet:{cedula}</Text>
-    <Text style={styles.details}>Nombre:{nombres}</Text>
-    <Text style={styles.details}>Apellidos:{primer_apellido}</Text>
-    <Text style={styles.details}>Genero:{sexo}</Text>
-  </View>
+const Item = ({ cedula, nombres, primer_apellido, segundo_apellido, sexo }) => (
+  <Card>
+    <View style={styles.item}>
+      <Image source={foto} />
+      <Text style={styles.title}>Carnet:{cedula}</Text>
+      <Text style={styles.title}>Nombre:{nombres}</Text>
+      <Text style={styles.title}>Primer_apellido:{primer_apellido}</Text>
+      <Text style={styles.title}>Segundo_apellido:{segundo_apellido}</Text>
+      <Text style={styles.title}>Genero:{sexo}</Text>
+    </View>
+  </Card>
 );
 
 // the filter
 const List = (props) => {
+  const [searchData, SetSearchData] = useState([]);
   const renderItem = ({ item }) => {
     // when no input, no show all
     if (props.searchPhrase === "") {
-      return;
+      return null;
     }
     // filter of the name
     else if (
-      item.cedula
-        .toUpperCase()
-        .includes(props.searchPhrase.toUpperCase().trim().replace(/\s/g, ""))
+      item.cedula.toUpperCase().includes(
+        props.searchPhrase
+          .toUpperCase()
+          .trim()
+          .replace(/^(7,8,9)([0-9]{9})$/g, "")
+      )
     ) {
       return (
         <Item
           cedula={item.cedula}
           nombres={item.nombres}
           primer_apellido={item.primer_apellido}
+          segundo_apellido={item.segundo_apellido}
           sexo={item.sexo}
         />
       );
@@ -50,11 +69,15 @@ const List = (props) => {
           props.setClicked(false);
         }}
       >
-        <FlatList
-          data={props.data}
-          renderItem={renderItem}
-          keyExtractor={(item) => item.cedula}
-        />
+        {searchData.filter((n) => n.length == 11) ? (
+          <FlatList
+            data={props.data}
+            renderItem={renderItem}
+            keyExtractor={(item) => item.cedula.toString()}
+          />
+        ) : (
+          <ActivityIndicator size="large" />
+        )}
       </View>
     </SafeAreaView>
   );
@@ -69,14 +92,13 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   item: {
-    margin: 30,
-    borderBottomWidth: 2,
-    borderBottomColor: "lightgrey",
+    margin: 15,
   },
   title: {
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 5,
     fontStyle: "italic",
+    color: "white",
   },
 });
