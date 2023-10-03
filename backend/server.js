@@ -52,8 +52,8 @@ app.post("/mssql/register", async function (req, res) {
   const query =
     "insert into users(username, password) values(@username, @password)";
   request
-    .input("username", sql.NVarChar(50), req.body.username)
-    .input("password", sql.NVarChar(50), req.body.hashedpassword);
+    .input("username", sql.NVarChar(50), username)
+    .input("password", sql.NVarChar(50), password.hashedpassword);
   try {
     const result = await request.query(query);
     console.log(result);
