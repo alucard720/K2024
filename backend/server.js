@@ -1,20 +1,29 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const bcrypt = require("bcryptjs");
 const sql = require("mssql");
-const jwt = require("jsonwebtoken");
 const bodyParser = require("body-parser");
+const controller = require("./controllers/userController");
+const verifyToken = require("./middleware/verifyToken");
+const DbConn = require("./config/dbSQL");
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 5000;
-
+DbConn();
 app.use(cors());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+//routes
+app.get("/users", controller.getAllUsers);
+app.post("/register", controller.createNewuser);
+app.post("/login", verifyToken, controller.login);
+
+//routes
+
 //start sql_server
-const config = {
+/* const config = {
   user: process.env.SQL_USER,
   password: process.env.SQL_USER_PASSWORD,
   server: process.env.SQL_USER_SERVER,
@@ -34,21 +43,12 @@ const config = {
 const db = sql.connect(config, function (err) {
   if (err) throw err;
   console.log("Server connection established");
-});
-//get all users
-app.get("/mssql/users", async function (req, res) {
-  const request = db.request();
-  const result = await request.query("SELECT * FROM dbo.PRUEBA01");
-  res.json({ msg: "Fetch user success", data: result.recordsets });
-});
+});  */
 
-async function hashPassword(password) {
-  const saltRounds = 10;
-  return bcrypt.hash(password, saltRounds);
-}
+//get all users
 
 //POST register
-app.post("/mssql/register", async function (req, res) {
+/* app.post("/mssql/register", async function (req, res) {
   const { email, password } = req.body;
   try {
     const hashedPassword = await hashPassword(password);
@@ -69,9 +69,9 @@ app.post("/mssql/register", async function (req, res) {
     console.error(error);
     res.status(500).json({ success: false, message: "Registration failed" });
   }
-});
+}); */
 //POST login
-
+/* 
 app.post("/mssql/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -100,29 +100,8 @@ app.post("/mssql/login", async (req, res) => {
     sql.close();
   }
 
-  /* 
-  try {
-    const result = await db.query(query);
-    if (result.recordsets.length === 1) {
-      const user = result.recordsets[0];
-      const match = await bycrpt.compare(password, user.password);
-
-      if (match) {
-        const token = jwt.sign({ email: user.email }, process.env.SECRET_KEY, {
-          expiresIn: "1h",
-        });
-        res.json({ success: true, token: token });
-      } else {
-        res.status(401).json({ success: false, status: "Invalid Credentials" });
-      }
-    } else {
-      res.status(401).json({ success: false, status: "User not Found" });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ success: false, message: "Internal server error" });
-  } */
-});
+ 
+}); */
 
 //POST UPDATE user
 
@@ -148,9 +127,6 @@ app.post("/mssql/delete:id", async (req, res) => {
   res.json({ msg: "Delete User Data successfully" });
 });
 
-async function correctPassword(candidatePassword, userPassword) {
-  return await bcrypt.compare(candidatePassword, userPassword);
-}
 // start the server
 app.listen(port, () => {
   console.log(`Server is running on port: ${port}`);

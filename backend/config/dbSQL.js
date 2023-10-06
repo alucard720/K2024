@@ -1,10 +1,26 @@
 const sql = require("mssql");
 
-const sql = {
-  user: "miguel.santana",
-  password: "gwS^zMq1",
-  server: "estrategia.database.windows.net",
-  database: "dbo.ciudadanos",
+const dbConn = () => {
+  const config = {
+    user: process.env.SQL_USER,
+    password: process.env.SQL_USER_PASSWORD,
+    server: process.env.SQL_USER_SERVER,
+    database: process.env.SQL_DATABASE,
+    pool: {
+      max: 5,
+      min: 0,
+      idleTimeoutMillis: 30000,
+    },
+    options: {
+      trustedConnection: false,
+      trustServerCertificate: false,
+      encrypt: false,
+      enableArithAbort: true,
+    },
+  };
+  sql.connect(config, function (err) {
+    if (err) throw err;
+  });
 };
 
-models.export = sql;
+module.exports = dbConn;
