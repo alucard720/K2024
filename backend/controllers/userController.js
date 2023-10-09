@@ -105,7 +105,17 @@ const login = async (req, res) => {
     } else {
       res.status(401).json({ message: "Invalid credentials" });
     }
-  } catch (err) {
+
+    if (match) {
+      const token = jwt.sign({ email: user.email }, process.env.SECRET_KEY, {
+        expiresIn: "1h",
+      });
+      res.json({ success: true, token: token });
+    } else {
+      res.status(401).json({ success: false, status: "Invalid Credentials" });
+    }
+  } 
+    catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
@@ -135,7 +145,7 @@ const login = async (req, res) => {
 };
 
 //authentication controller
-async function correctPassword(candidatePassword, userPassword) {
+const match = async function correctPassword(candidatePassword, userPassword) {
   return await bcrypt.compare(candidatePassword, userPassword);
 }
 
@@ -144,7 +154,7 @@ const checkDuplicateUser = async (email) => {
   try {
     await sql.connect(config);
     const result =
-      await sql.query`SELECT COUNT(*) AS count FROM users WHERE email = ${email}`;
+      await sql.query`SELECT 1 AS count FROM users WHERE email = ${email}`;
 
     if (result.recordset[0].count > 0) {
       // User already exists
