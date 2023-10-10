@@ -1,11 +1,10 @@
 const sql = require("mssql");
 const bcrypt = require("bcryptjs");
-const dotenv = require("dotenv");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-dotenv.config();
+const db = require('../config/dbSQL');
 
-const config = {
+/* const config = {
   user: process.env.SQL_USER,
   password: process.env.SQL_USER_PASSWORD,
   server: process.env.SQL_USER_SERVER,
@@ -25,12 +24,13 @@ const config = {
 const db = sql.connect(config, function (err) {
   if (err) throw err;
   console.log("Server connection established");
-});
+}); */
+
 
 //Get all users
 const getAllUsers = async (req, res) => {
   const request = db.request();
-  const result = await request.query("SELECT * FROM dbo.PRUEBA01");
+  const result = await request.query("SELECT * FROM dbo.users");
   res.json({ msg: "Fetch user success", data: result.recordsets });
 };
 
@@ -39,7 +39,7 @@ async function hashPassword(password) {
   return bcrypt.hash(password, saltRounds);
 }
 
-//POST register
+//hash 
 
 async function hashPassword(password) {
   const saltRounds = 10;
@@ -50,11 +50,11 @@ async function hashPassword(password) {
 const createNewuser = async (req, res) => {
   const { email, password } = req.body;
 
-  //confirm data
+  //confirmar data
   if (!email || !password) {
     return res.status(401).json({ message: "Todos los campos son requeridos" });
   }
-
+//usuario duplicado
   if (await checkDuplicateUser(email)) {
     return res.status(403).json({ message: true, msg: "usuario duplicado" });
   }
@@ -80,7 +80,6 @@ const createNewuser = async (req, res) => {
     res.status(500).json({ success: false, message: "Registration failed" });
   }
 
-  //usuario duplicado
 };
 //POST login
 
@@ -106,6 +105,10 @@ const login = async (req, res) => {
       res.status(401).json({ message: "Invalid credentials" });
     }
 
+    if(!match){
+      return res.status(400).json({message:"Invalid username or password"});
+    }
+
     if (match) {
       const token = jwt.sign({ email: user.email }, process.env.SECRET_KEY, {
         expiresIn: "1h",
@@ -119,6 +122,11 @@ const login = async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
+
+
+
+  //Actualizar Usuario
+
 
   /* 
   try {
@@ -144,6 +152,28 @@ const login = async (req, res) => {
   } */
 };
 
+const upUsers =  async (req, res) => {
+  const request = db.request();
+
+  request.input("username", sql.NVarChar, req.body.username);
+  request.input("password", sql.NVarChar, req.body.password);
+
+  await request.query(
+    "update users set username=@username, password=@password"
+  );
+  res.json({ msg: "success update user" });
+}
+
+
+//DELETE
+const delUsers = async (req, res) => {
+  const request = db.request();
+
+  request.input("id", sql.int, req.params.id);
+
+  await request.query("delete * from users id=@id");
+  res.json({ msg: "Delete User Data successfully" });
+}
 //authentication controller
 const match = async function correctPassword(candidatePassword, userPassword) {
   return await bcrypt.compare(candidatePassword, userPassword);
@@ -152,7 +182,7 @@ const match = async function correctPassword(candidatePassword, userPassword) {
 //duplicate user
 const checkDuplicateUser = async (email) => {
   try {
-    await sql.connect(config);
+    await db.connectToDatagase();
     const result =
       await sql.query`SELECT 1 AS count FROM users WHERE email = ${email}`;
 
@@ -169,4 +199,4 @@ const checkDuplicateUser = async (email) => {
   }
 };
 
-module.exports = { createNewuser, login, getAllUsers };
+module.exports = { createNewuser, login, getAllUsers, upUsers, delUsers };
