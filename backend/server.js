@@ -18,7 +18,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //routes
 app.get("/users", controller.getAllUsers);
 app.post("/register", controller.createNewuser);
-app.post("/login", verifyToken, controller.login);
+app.post("/login", controller.login);
 
 //routes
 
