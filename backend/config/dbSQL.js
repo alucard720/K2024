@@ -1,26 +1,34 @@
 const sql = require("mssql");
 
-const dbConn = () => {
+
   const config = {
-    user: process.env.SQL_USER,
-    password: process.env.SQL_USER_PASSWORD,
-    server: process.env.SQL_USER_SERVER,
-    database: process.env.SQL_DATABASE,
-    pool: {
-      max: 5,
-      min: 0,
-      idleTimeoutMillis: 30000,
-    },
+    user: process.env.SQL_AZURE_USER,
+    password: process.env.SQL_AZURE_PASS,
+    server: process.env.SQL_AZURE_SERVER,
+    database: process.env.SQL_AZURE_DATA,
     options: {
-      trustedConnection: false,
-      trustServerCertificate: false,
-      encrypt: false,
-      enableArithAbort: true,
+     encrypt:true,
+     trustServerCertificate:false,
     },
   };
-  sql.connect(config, function (err) {
-    if (err) throw err;
-  });
-};
 
-module.exports = dbConn;
+ let pool;
+ 
+
+async function connectToDatagase(){
+  try {
+    pool= await sql.connect(config)
+    console.log('Connect to Azure SQL Server')
+  } catch (error) {
+    console.error('Error connnecting to the database', error)
+  }
+}
+
+module.exports={
+  connectToDatagase, pool
+}
+
+
+
+
+
