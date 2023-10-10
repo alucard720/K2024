@@ -2,7 +2,6 @@ const sql = require("mssql");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
-const db = require('../config/dbSQL');
 
 /* const config = {
   user: process.env.SQL_USER,
@@ -21,11 +20,38 @@ const db = require('../config/dbSQL');
     enableArithAbort: true,
   },
 };
+
+
+
 const db = sql.connect(config, function (err) {
   if (err) throw err;
   console.log("Server connection established");
 }); */
 
+async function connectToAzureSQL() {
+  try {
+    // Azure SQL Database connection configuration
+    const config = {
+      user: process.env.SQL_AZURE_USER,
+      password: process.env.SQL_AZURE_PASS,
+      server: process.env.SQL_AZURE_SERVER,
+      database: process.env.SQL_AZURE_DATA,
+      options: {
+       encrypt:true,
+       trustServerCertificate:false,
+      },
+    };    
+
+    // Create a connection pool
+    const pool = await new sql.ConnectionPool(config).connect();
+
+    // Return the connection pool
+    return pool;
+  } catch (err) {
+    console.error('Error connecting to Azure SQL Database:', err);
+    throw err;
+  }
+}
 
 //Get all users
 const getAllUsers = async (req, res) => {
@@ -34,10 +60,7 @@ const getAllUsers = async (req, res) => {
   res.json({ msg: "Fetch user success", data: result.recordsets });
 };
 
-async function hashPassword(password) {
-  const saltRounds = 10;
-  return bcrypt.hash(password, saltRounds);
-}
+
 
 //hash 
 
@@ -64,8 +87,8 @@ const createNewuser = async (req, res) => {
     const hashedPassword = await hashPassword(password);
 
     //connect to database to save user with hash password
-    const request = db.request();
-    const query =
+const pool = await connectToAzureSQL()   
+ const query =
       "insert into users(email, password) values(@email, @password)";
     request
       .input("email", sql.NVarChar, email)
