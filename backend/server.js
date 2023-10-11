@@ -15,15 +15,9 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 //routes
 app.get("/users", controller.getAllUsers);
+app.get("/users", controller.getAllUsers);
 app.post("/register", controller.createNewuser);
-<<<<<<< HEAD
 app.post("/login", controller.login);
-=======
-app.post("/login", controller.login); 
->>>>>>> 7e6d0edb6b49c11551da299f48b8dfcfffecec54
-
-
-
 
 // start the server
 app.listen(port, () => {

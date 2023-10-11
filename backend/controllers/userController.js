@@ -3,6 +3,8 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 
+//ONPREMISES CONNECTIONS
+
 /* const config = {
   user: process.env.SQL_USER,
   password: process.env.SQL_USER_PASSWORD,
@@ -28,41 +30,47 @@ const db = sql.connect(config, function (err) {
   console.log("Server connection established");
 }); */
 
+// Azure SQL Database connection configuration
+const config = {
+  user: process.env.SQL_AZURE_USER,
+  password: process.env.SQL_AZURE_PASS,
+  server: process.env.SQL_AZURE_SERVER,
+  database: process.env.SQL_AZURE_DATA,
+  options: {
+    encrypt: true,
+    trustServerCertificate: false,
+  },
+};
+
 async function connectToAzureSQL() {
   try {
-    // Azure SQL Database connection configuration
-    const config = {
-      user: process.env.SQL_AZURE_USER,
-      password: process.env.SQL_AZURE_PASS,
-      server: process.env.SQL_AZURE_SERVER,
-      database: process.env.SQL_AZURE_DATA,
-      options: {
-       encrypt:true,
-       trustServerCertificate:false,
-      },
-    };    
-
-    // Create a connection pool
-    const pool = await new sql.ConnectionPool(config).connect();
-
-    // Return the connection pool
-    return pool;
-  } catch (err) {
-    console.error('Error connecting to Azure SQL Database:', err);
-    throw err;
+    await new sql.ConnectionPool(config)
+      .then((pool) => {
+        return pool.query`SELECT * FROM dbo.users`;
+      })
+      .then((result) => {
+        console.dir(result);
+      });
+    console.log("Connected to Azure SQL");
+  } catch (error) {
+    console.error("Database connection error", error);
   }
 }
 
 //Get all users
-const getAllUsers = async (req, res) => {
-  const request = db.request();
-  const result = await request.query("SELECT * FROM dbo.users");
-  res.json({ msg: "Fetch user success", data: result.recordsets });
+const getAllUsers = async () => {
+  try {
+    const request = new sql.Request();
+    const query = " SELECT email, password FROM users";
+    const result = await request.query(query);
+    return result.recordset;
+  } catch (error) {
+    console.error("Database connection error", error);
+    return [];
+  }
 };
 
-
-
-//hash 
+//hash
 
 async function hashPassword(password) {
   const saltRounds = 10;
@@ -77,22 +85,22 @@ const createNewuser = async (req, res) => {
   if (!email || !password) {
     return res.status(401).json({ message: "Todos los campos son requeridos" });
   }
-//usuario duplicado
-  if (await checkDuplicateUser(email)) {
+  //usuario duplicado
+  /*   if (await checkDuplicateUser(email)) {
     return res.status(403).json({ message: true, msg: "usuario duplicado" });
   }
-
+ */
   //funcion para crear el usuario
   try {
     const hashedPassword = await hashPassword(password);
 
     //connect to database to save user with hash password
-const pool = await connectToAzureSQL()   
- const query =
-      "insert into users(email, password) values(@email, @password)";
+    const request = new sql.Request();
     request
       .input("email", sql.NVarChar, email)
       .input("password", sql.VarChar, hashedPassword);
+    const query =
+      "insert into users(email, password) values(@email, @password)";
 
     //results
     const result = await request.query(query);
@@ -102,7 +110,6 @@ const pool = await connectToAzureSQL()
     console.error(error);
     res.status(500).json({ success: false, message: "Registration failed" });
   }
-
 };
 //POST login
 
@@ -114,7 +121,7 @@ const login = async (req, res) => {
   }
 
   try {
-    await sql.connect(config);
+    await connectToAzureSQL();
     const result =
       await sql.query`SELECT email, password FROM users WHERE email = ${email}`;
 
@@ -128,8 +135,8 @@ const login = async (req, res) => {
       res.status(401).json({ message: "Invalid credentials" });
     }
 
-    if(!match){
-      return res.status(400).json({message:"Invalid username or password"});
+    if (!match) {
+      return res.status(400).json({ message: "Invalid username or password" });
     }
 
     if (match) {
@@ -140,16 +147,12 @@ const login = async (req, res) => {
     } else {
       res.status(401).json({ success: false, status: "Invalid Credentials" });
     }
-  } 
-    catch (err) {
+  } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 
-
-
   //Actualizar Usuario
-
 
   /* 
   try {
@@ -175,8 +178,8 @@ const login = async (req, res) => {
   } */
 };
 
-const upUsers =  async (req, res) => {
-  const request = db.request();
+const upUsers = async (req, res) => {
+  const request = sql.Request();
 
   request.input("username", sql.NVarChar, req.body.username);
   request.input("password", sql.NVarChar, req.body.password);
@@ -185,27 +188,27 @@ const upUsers =  async (req, res) => {
     "update users set username=@username, password=@password"
   );
   res.json({ msg: "success update user" });
-}
-
+};
 
 //DELETE
 const delUsers = async (req, res) => {
-  const request = db.request();
+  const request = sql.Request();
 
   request.input("id", sql.int, req.params.id);
 
   await request.query("delete * from users id=@id");
   res.json({ msg: "Delete User Data successfully" });
-}
-//authentication controller
+};
+
+///===AUTHENTICATION FUNCIATIONS
 const match = async function correctPassword(candidatePassword, userPassword) {
   return await bcrypt.compare(candidatePassword, userPassword);
-}
+};
 
 //duplicate user
 const checkDuplicateUser = async (email) => {
   try {
-    await db.connectToDatagase();
+    await new sql.ConnectionPool(config);
     const result =
       await sql.query`SELECT 1 AS count FROM users WHERE email = ${email}`;
 
