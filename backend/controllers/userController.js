@@ -36,22 +36,17 @@ const config = {
   password: process.env.SQL_AZURE_PASS,
   server: process.env.SQL_AZURE_SERVER,
   database: process.env.SQL_AZURE_DATA,
+
   options: {
     encrypt: true,
-    trustServerCertificate: false,
   },
 };
 
 async function connectToAzureSQL() {
   try {
-    await new sql.ConnectionPool(config)
-      .then((pool) => {
-        return pool.query`SELECT * FROM dbo.users`;
-      })
-      .then((result) => {
-        console.dir(result);
-      });
-    console.log("Connected to Azure SQL");
+    await new sql.connect(config);
+    const result = await sql.query`select * from dbo.ciudadanos.03`;
+    console.dir(result);
   } catch (error) {
     console.error("Database connection error", error);
   }
@@ -60,9 +55,15 @@ async function connectToAzureSQL() {
 //Get all users
 const getAllUsers = async () => {
   try {
-    const request = new sql.Request();
-    const query = " SELECT email, password FROM users";
-    const result = await request.query(query);
+    /*     const request = new sql.Request();
+     */
+
+    const poolConnection = await new sql.ConnectionPool(config);
+    const resultSet = await poolConnection
+      .request()
+      .query(` SELECT * FROM dbo.ciudadanos.03`);
+    /*     const query = " SELECT * FROM dbo.ciudadanos.03";
+     */ const result = await request.recordset(resultSet);
     return result.recordset;
   } catch (error) {
     console.error("Database connection error", error);
